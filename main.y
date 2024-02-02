@@ -6,13 +6,13 @@ enum TOK_TYPE {
 };
 
 struct _Tok_t_INC {
-  char* S;
+  char S[200];
   bool post;
 };
 
 union _Tok_t {
   int I;
-  char* S;
+  char S[200];
   _Tok_t_INC INC;
 };
 
@@ -43,7 +43,7 @@ extern void ensureinitted(std::string s);
 %}
 
 %token  END 0
-%token STR INT 
+%token STR INT PLUSPLUS
 
 // %union{
 //   // 
@@ -120,7 +120,7 @@ add: term {
   }
 }
 
-term: '+' '+' STR {
+term: PLUSPLUS STR {
   // var_name = std::string($3);
   // value = hashtable[var_name];
   // std::cout << "DBG: ++STR: ++" << $3 << " = ++" << value << std::endl;
@@ -130,8 +130,9 @@ term: '+' '+' STR {
   // postincr = false;
   // $$ = strdup($3);
   $$.e = TOK_TYPE_INC;
-  ensureinitted(std::string($3.v.S));
-  $$.v.INC.S = strdup($3.v.S);
+  ensureinitted(std::string($2.v.S));
+  // $$.v.INC.S = strdup($3.v.S);
+  strncpy($$.v.INC.S, $2.v.S, 200);
   $$.v.INC.post = false;
 }
 
@@ -142,7 +143,8 @@ term: STR {
   // $$ = strdup($1);
   $$.e = $1.e;
   ensureinitted(std::string($1.v.S));
-  $$.v.S = strdup($1.v.S);
+  // $$.v.S = strdup($1.v.S);
+  strncpy($$.v.S, $1.v.S, 200);
 }
 
 term: comp {
@@ -151,18 +153,20 @@ term: comp {
     $$.v.I = $1.v.I;
   } else {
     ensureinitted(std::string($1.v.INC.S));
-    $$.v.INC.S = strdup($1.v.INC.S);
+    // $$.v.INC.S = strdup($1.v.INC.S);
+    strncpy($$.v.INC.S, $1.v.INC.S, 200);
   }
 }
 
-comp: STR '+' '+' {
+comp: STR PLUSPLUS {
   // postincr = true;
   // var_name = std::string($1);
   // value = hashtable[var_name]++;
   // $$ = strdup($1);
   $$.e = TOK_TYPE_INC;
   ensureinitted(std::string($1.v.S));
-  $$.v.INC.S = strdup($1.v.S);
+  // $$.v.INC.S = strdup($1.v.S);
+  strncpy($$.v.INC.S, $1.v.S, 200);
   $$.v.INC.post = true;
 }
 
