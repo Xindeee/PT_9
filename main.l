@@ -6,13 +6,13 @@
 };
 
 struct _Tok_t_INC {
-  char* S;
+  char S[200];
   bool post;
 };
 
 union _Tok_t {
   int I;
-  char* S;
+  char S[200];
   _Tok_t_INC INC;
 };
 
@@ -31,7 +31,8 @@ struct Tok_t {
 
 [a-zA-Z][a-zA-Z0-9]* {
   yylval.e = TOK_TYPE_S;
-  yylval.v.S = strdup(yytext);
+  // yylval.v.S = strdup(yytext);
+  strncpy(yylval.v.S, yytext, 200);
   return STR;
 }
 [0-9]+ {
@@ -40,8 +41,8 @@ struct Tok_t {
   return INT;
 }
 
-\+ { return '+'; }
-\= { return '='; }
-
+\+   { return '+'; }
+\=   { return '='; }
+\+\+ { return PLUSPLUS; }
 
 %%
